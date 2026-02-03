@@ -1,86 +1,151 @@
 "use client";
 
-import { Float, MeshDistortMaterial } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useRef, useMemo } from "react";
-import type { Mesh, PointLight } from "three";
+import { useMemo, useRef } from "react";
+import * as THREE from "three";
 
-type ShapeConfig = {
-  pos: [number, number, number];
-  scale: number;
-  speed: number;
-  geo: "torusKnot" | "octahedron" | "icosahedron";
-};
+const vertexShader = `
+  varying vec2 vUv;
+  varying vec3 vPosition;
 
-const shapes: ShapeConfig[] = [
-  { pos: [-3.5, 2, -2], scale: 0.6, speed: 0.3, geo: "torusKnot" },
-  { pos: [3.8, -1.5, -3], scale: 0.8, speed: 0.2, geo: "octahedron" },
-  { pos: [-2, -2.5, -1], scale: 0.5, speed: 0.4, geo: "icosahedron" },
-  { pos: [2.5, 2.5, -4], scale: 0.7, speed: 0.25, geo: "torusKnot" },
-  { pos: [0, -3, -2], scale: 0.4, speed: 0.35, geo: "octahedron" },
-  { pos: [-4, 0, -3], scale: 0.55, speed: 0.3, geo: "icosahedron" },
-];
+  void main() {
+    vUv = uv;
+    vPosition = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-function FloatingShape({ pos, scale, speed, geo }: ShapeConfig) {
-  const meshRef = useRef<Mesh>(null);
+const fragmentShader = `
+  uniform float uTime;
+  uniform vec2 uMouse;
+  uniform vec2 uResolution;
+  uniform vec3 uGridColor;
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    meshRef.current.rotation.x += speed * 0.005;
-    meshRef.current.rotation.y += speed * 0.008;
-  });
+  varying vec2 vUv;
+  varying vec3 vPosition;
 
-  const geometry = useMemo(() => {
-    switch (geo) {
-      case "torusKnot":
-        return <torusKnotGeometry args={[1, 0.3, 128, 16]} />;
-      case "octahedron":
-        return <octahedronGeometry args={[1, 0]} />;
-      case "icosahedron":
-        return <icosahedronGeometry args={[1, 0]} />;
-    }
-  }, [geo]);
+  void main() {
+    // Aspect ratio correction
+    vec2 uv = vUv;
+    float aspect = uResolution.x / uResolution.y;
 
-  return (
-    <Float speed={1.5} rotationIntensity={0.4} floatIntensity={1.2}>
-      <mesh ref={meshRef} position={pos} scale={scale}>
-        {geometry}
-        <MeshDistortMaterial
-          color="#ea580c"
-          roughness={0.4}
-          metalness={0.8}
-          distort={0.15}
-          speed={1.5}
-          opacity={0.15}
-          transparent
-        />
-      </mesh>
-    </Float>
+    // Apply perspective distortion (converging lines toward top)
+    vec2 centeredUv = uv - 0.5;
+    float perspectiveStrength = 0.4;
+    float yFactor = 1.0 + centeredUv.y * perspectiveStrength;
+    centeredUv.x *= yFactor;
+    uv = centeredUv + 0.5;
+
+    // Scale and aspect correct
+    uv.x *= aspect;
+
+    // Grid parameters
+    float gridSize = 25.0;
+    vec2 grid = uv * gridSize;
+
+    // Create grid lines
+    vec2 gridFract = fract(grid);
+    float lineWidth = 0.03;
+
+    // Horizontal and vertical lines
+    float hLine = smoothstep(lineWidth, 0.0, gridFract.y) + smoothstep(1.0 - lineWidth, 1.0, gridFract.y);
+    float vLine = smoothstep(lineWidth, 0.0, gridFract.x) + smoothstep(1.0 - lineWidth, 1.0, gridFract.x);
+    float lines = max(hLine, vLine);
+
+    // Mouse position (normalized and aspect corrected)
+    vec2 mousePos = uMouse;
+
+    // Apply same perspective to mouse
+    vec2 centeredMouse = mousePos - 0.5;
+    float mousePerspective = 1.0 + centeredMouse.y * perspectiveStrength;
+    centeredMouse.x *= mousePerspective;
+    mousePos = centeredMouse + 0.5;
+    mousePos.x *= aspect;
+
+    // Distance from mouse to current UV
+    vec2 currentUv = uv;
+    float dist = length(currentUv - mousePos);
+
+    // Glow effect - exponential falloff
+    float glowRadius = 0.15;
+    float glow = exp(-dist * dist / (glowRadius * glowRadius));
+    glow = pow(glow, 1.5);
+
+    // Fade grid toward edges (softer vignette)
+    vec2 vignette = smoothstep(0.0, 0.15, vUv) * smoothstep(1.0, 0.85, vUv);
+    float vignetteFactor = vignette.x * vignette.y;
+
+    // Base opacity - visible but subtle
+    float baseOpacity = 0.4;
+
+    // Final alpha with glow boost
+    float alpha = lines * (baseOpacity + glow * 0.5) * vignetteFactor;
+
+    // Color - subtle base, bright on glow
+    vec3 baseColor = uGridColor * 0.4;
+    vec3 glowColor = uGridColor * 2.0;
+    vec3 finalColor = mix(baseColor, glowColor, glow);
+
+    // Add slight bloom around glow area
+    float bloom = glow * 0.15;
+    alpha += bloom * vignetteFactor;
+
+    // Clamp alpha
+    alpha = clamp(alpha, 0.0, 0.7);
+
+    gl_FragColor = vec4(finalColor, alpha);
+  }
+`;
+
+function PerspectiveGrid() {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const { viewport, size } = useThree();
+  const mousePos = useRef({ x: 0.5, y: 0.5 });
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      uResolution: { value: new THREE.Vector2(size.width, size.height) },
+      uGridColor: { value: new THREE.Color("#ea580c") },
+    }),
+    [size.width, size.height],
   );
-}
-
-function MouseLight() {
-  const lightRef = useRef<PointLight>(null);
-  const { viewport } = useThree();
 
   useFrame((state) => {
-    if (!lightRef.current) return;
-    const x = (state.pointer.x * viewport.width) / 2;
-    const y = (state.pointer.y * viewport.height) / 2;
-    lightRef.current.position.set(x, y, 3);
+    if (!materialRef.current) return;
+
+    // Update time
+    materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+
+    // Smooth mouse tracking
+    const targetX = (state.pointer.x + 1) / 2;
+    const targetY = (state.pointer.y + 1) / 2;
+
+    mousePos.current.x += (targetX - mousePos.current.x) * 0.06;
+    mousePos.current.y += (targetY - mousePos.current.y) * 0.06;
+
+    materialRef.current.uniforms.uMouse.value.set(
+      mousePos.current.x,
+      mousePos.current.y,
+    );
   });
 
-  return <pointLight ref={lightRef} intensity={2} color="#ea580c" />;
+  return (
+    <mesh scale={[viewport.width, viewport.height, 1]}>
+      <planeGeometry args={[1, 1, 1, 1]} />
+      <shaderMaterial
+        ref={materialRef}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        uniforms={uniforms}
+        transparent
+        depthWrite={false}
+      />
+    </mesh>
+  );
 }
 
 export default function Scene() {
-  return (
-    <>
-      <ambientLight intensity={0.15} />
-      <MouseLight />
-      {shapes.map((s, i) => (
-        <FloatingShape key={i} {...s} />
-      ))}
-    </>
-  );
+  return <PerspectiveGrid />;
 }

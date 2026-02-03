@@ -1,3 +1,4 @@
+import About from "@/components/About";
 import Hero from "@/components/Hero";
 import { getHeroContent } from "@/lib/sanity/hero";
 import { Locale } from "@/types/locale";
@@ -14,6 +15,10 @@ export default async function HomePage({
   return (
     <main>
       <Hero content={heroContent} />
+      <About
+        title={heroContent.aboutTitle}
+        description={heroContent.aboutDescription}
+      />
     </main>
   );
 }

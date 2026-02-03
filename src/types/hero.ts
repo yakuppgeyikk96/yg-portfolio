@@ -8,6 +8,8 @@ export interface HeroContent {
   tagline: string;
   primaryCta: HeroCta;
   secondaryCta?: HeroCta;
+  aboutTitle?: string;
+  aboutDescription?: string;
 }
 
 export interface HeroSectionProps {

@@ -60,5 +60,23 @@ export const homePageType = defineType({
       title: "İkincil buton link",
       type: "string",
     }),
+    defineField({
+      name: "aboutTitle",
+      title: "Hakkımda Başlık",
+      type: "object",
+      fields: [
+        { name: "en", type: "string", title: "English" },
+        { name: "tr", type: "string", title: "Türkçe" },
+      ],
+    }),
+    defineField({
+      name: "aboutDescription",
+      title: "Hakkımda Açıklama",
+      type: "object",
+      fields: [
+        { name: "en", type: "text", title: "English" },
+        { name: "tr", type: "text", title: "Türkçe" },
+      ],
+    }),
   ],
 });

@@ -23,10 +23,18 @@ type SanityHero = {
   tagline?: string | null;
   primaryCta?: { label?: string | null; href?: string | null };
   secondaryCta?: { label?: string | null; href?: string | null } | null;
+  aboutTitle?: string | null;
+  aboutDescription?: string | null;
 };
 
 function getDefaultHero(locale: Locale): HeroContent {
   return defaultHeroContent[locale] ?? defaultHeroContent.en;
+}
+
+function prefixHref(href: string | null | undefined, locale: string): string {
+  if (!href) return `/${locale}`;
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) return href;
+  return href.startsWith("/") ? `/${locale}${href}` : `/${locale}/${href}`;
 }
 
 export async function getHeroContent(locale: Locale): Promise<HeroContent> {
@@ -52,13 +60,20 @@ export async function getHeroContent(locale: Locale): Promise<HeroContent> {
       primaryCta: {
         label:
           data.primaryCta?.label ?? getDefaultHero(safeLocale).primaryCta.label,
-        href:
+        href: prefixHref(
           data.primaryCta?.href ?? getDefaultHero(safeLocale).primaryCta.href,
+          safeLocale,
+        ),
       },
       secondaryCta:
         data.secondaryCta?.label && data.secondaryCta?.href
-          ? { label: data.secondaryCta.label, href: data.secondaryCta.href }
+          ? {
+              label: data.secondaryCta.label,
+              href: prefixHref(data.secondaryCta.href, safeLocale),
+            }
           : getDefaultHero(safeLocale).secondaryCta,
+      aboutTitle: data.aboutTitle ?? undefined,
+      aboutDescription: data.aboutDescription ?? undefined,
     };
   } catch {
     return getDefaultHero(safeLocale);

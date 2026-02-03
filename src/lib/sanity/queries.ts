@@ -8,5 +8,7 @@ export const heroQuery = `*[_type == "homePage"][0] {
   "secondaryCta": {
     "label": secondaryCtaLabel[$locale],
     "href": secondaryCtaHref
-  }
+  },
+  "aboutTitle": aboutTitle[$locale],
+  "aboutDescription": aboutDescription[$locale]
 }`;

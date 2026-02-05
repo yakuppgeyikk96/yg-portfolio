@@ -1,6 +1,8 @@
 import About from "@/components/About";
 import Hero from "@/components/Hero";
+import TechStack from "@/components/TechStack";
 import { getHeroContent } from "@/lib/sanity/hero";
+import { getTechnologies } from "@/lib/sanity/technologies";
 import { Locale } from "@/types/locale";
 
 export default async function HomePage({
@@ -10,7 +12,11 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const safeLocale: Locale = locale === "tr" || locale === "en" ? locale : "en";
-  const heroContent = await getHeroContent(safeLocale);
+
+  const [heroContent, technologies] = await Promise.all([
+    getHeroContent(safeLocale),
+    getTechnologies(safeLocale),
+  ]);
 
   return (
     <main>
@@ -19,6 +25,7 @@ export default async function HomePage({
         title={heroContent.aboutTitle}
         description={heroContent.aboutDescription}
       />
+      <TechStack technologies={technologies} locale={safeLocale} />
     </main>
   );
 }

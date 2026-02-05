@@ -12,3 +12,10 @@ export const heroQuery = `*[_type == "homePage"][0] {
   "aboutTitle": aboutTitle[$locale],
   "aboutDescription": aboutDescription[$locale]
 }`;
+
+export const technologiesQuery = `*[_type == "technology"] | order(order asc)[0...8] {
+  _id,
+  "name": name[$locale],
+  icon,
+  order
+}`;

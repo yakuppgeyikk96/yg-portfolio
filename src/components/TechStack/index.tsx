@@ -2,7 +2,7 @@
 
 import type { Locale } from "@/types/locale";
 import type { Technology } from "@/types/technology";
-import { SectionHeader } from "./SectionHeader";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { TechCard } from "./TechCard";
 
 const uiStrings: Record<string, Record<Locale, string>> = {

@@ -1,7 +1,9 @@
 import About from "@/components/About";
+import FeaturedProjects from "@/components/FeaturedProjects";
 import Hero from "@/components/Hero";
 import TechStack from "@/components/TechStack";
 import { getHeroContent } from "@/lib/sanity/hero";
+import { getFeaturedProjects } from "@/lib/sanity/projects";
 import { getTechnologies } from "@/lib/sanity/technologies";
 import { Locale } from "@/types/locale";
 
@@ -13,9 +15,10 @@ export default async function HomePage({
   const { locale } = await params;
   const safeLocale: Locale = locale === "tr" || locale === "en" ? locale : "en";
 
-  const [heroContent, technologies] = await Promise.all([
+  const [heroContent, technologies, featuredProjects] = await Promise.all([
     getHeroContent(safeLocale),
     getTechnologies(safeLocale),
+    getFeaturedProjects(safeLocale),
   ]);
 
   return (
@@ -26,6 +29,7 @@ export default async function HomePage({
         description={heroContent.aboutDescription}
       />
       <TechStack technologies={technologies} locale={safeLocale} />
+      <FeaturedProjects projects={featuredProjects} locale={safeLocale} />
     </main>
   );
 }

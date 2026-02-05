@@ -19,3 +19,15 @@ export const technologiesQuery = `*[_type == "technology"] | order(order asc)[0.
   icon,
   order
 }`;
+
+export const featuredProjectsQuery = `*[_type == "project" && featured == true] | order(order asc)[0...3] {
+  _id,
+  "title": title[$locale],
+  "slug": slug.current,
+  "description": description[$locale],
+  image,
+  technologies,
+  liveUrl,
+  githubUrl,
+  order
+}`;

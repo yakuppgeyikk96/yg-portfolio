@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import ContactCTA from "@/components/ContactCTA";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import Hero from "@/components/Hero";
 import TechStack from "@/components/TechStack";
@@ -30,6 +31,7 @@ export default async function HomePage({
       />
       <TechStack technologies={technologies} locale={safeLocale} />
       <FeaturedProjects projects={featuredProjects} locale={safeLocale} />
+      <ContactCTA locale={safeLocale} />
     </main>
   );
 }

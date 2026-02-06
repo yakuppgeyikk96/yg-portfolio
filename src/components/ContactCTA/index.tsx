@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import Button from "@/components/ui/Button";
 import { SocialLinks } from "./SocialLinks";
 import type { Locale } from "@/types/locale";
-import type { SocialLink } from "@/types/contact";
+import { socialLinks } from "@/lib/social";
 
 const uiStrings: Record<string, Record<Locale, string>> = {
   title: {
@@ -20,20 +20,6 @@ const uiStrings: Record<string, Record<Locale, string>> = {
     tr: "İletişime Geç",
   },
 };
-
-const socialLinks: SocialLink[] = [
-  {
-    platform: "github",
-    url: "https://github.com/yakuppgeyikk96",
-    label: "GitHub",
-  },
-  {
-    platform: "linkedin",
-    url: "https://linkedin.com/in/yakupgeyik",
-    label: "LinkedIn",
-  },
-  { platform: "email", url: "mailto:yakuppgeyik@gmail.com", label: "Email" },
-];
 
 type ContactCTAProps = {
   locale: Locale;

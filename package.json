@@ -16,6 +16,7 @@
     "motion": "^12.29.3",
     "next": "16.1.6",
     "next-sanity": "^12.0.16",
+    "nodemailer": "^8.0.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sanity": "^5.7.0",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.182.0",

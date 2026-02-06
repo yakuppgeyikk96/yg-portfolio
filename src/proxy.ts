@@ -7,7 +7,7 @@ const defaultLocale = "tr";
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  if (pathname.startsWith("/studio")) {
+  if (pathname.startsWith("/studio") || pathname.startsWith("/api")) {
     return NextResponse.next();
   }
 

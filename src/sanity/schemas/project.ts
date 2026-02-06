@@ -67,6 +67,32 @@ export const projectType = defineType({
       type: "url",
     }),
     defineField({
+      name: "highlights",
+      title: "Öne Çıkan Özellikler",
+      description:
+        'Projenin 3-4 key feature\'ı. Örn: "Real-time data synchronization with WebSocket" / "WebSocket ile gerçek zamanlı veri senkronizasyonu"',
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            {
+              name: "en",
+              type: "string",
+              title: "English",
+              placeholder: "e.g. Server-side rendering with Next.js App Router",
+            },
+            {
+              name: "tr",
+              type: "string",
+              title: "Türkçe",
+              placeholder: "örn. Next.js App Router ile sunucu taraflı render",
+            },
+          ],
+        },
+      ],
+    }),
+    defineField({
       name: "featured",
       title: "Öne Çıkan",
       description: "Anasayfada gösterilsin mi?",

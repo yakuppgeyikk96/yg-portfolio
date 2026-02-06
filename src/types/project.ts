@@ -13,6 +13,7 @@ export interface Project {
   description: string;
   image: SanityImage;
   technologies: string[];
+  highlights: string[];
   liveUrl?: string;
   githubUrl?: string;
   order: number;

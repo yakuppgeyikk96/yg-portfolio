@@ -27,6 +27,20 @@ export const featuredProjectsQuery = `*[_type == "project" && featured == true] 
   "description": description[$locale],
   image,
   technologies,
+  "highlights": highlights[][$locale],
+  liveUrl,
+  githubUrl,
+  order
+}`;
+
+export const allProjectsQuery = `*[_type == "project"] | order(order asc) {
+  _id,
+  "title": title[$locale],
+  "slug": slug.current,
+  "description": description[$locale],
+  image,
+  technologies,
+  "highlights": highlights[][$locale],
   liveUrl,
   githubUrl,
   order

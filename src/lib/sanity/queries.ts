@@ -33,6 +33,14 @@ export const featuredProjectsQuery = `*[_type == "project" && featured == true] 
   order
 }`;
 
+export const allTechnologiesQuery = `*[_type == "technology" && defined(category)] | order(order asc) {
+  _id,
+  "name": name[$locale],
+  icon,
+  order,
+  category
+}`;
+
 export const allProjectsQuery = `*[_type == "project"] | order(order asc) {
   _id,
   "title": title[$locale],

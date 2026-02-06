@@ -1,7 +1,7 @@
-import type { Technology } from "@/types/technology";
+import type { Technology, TechnologyCategory, TechnologyWithDetails } from "@/types/technology";
 import type { Locale } from "@/types/locale";
 import { sanityClient } from "./client";
-import { technologiesQuery } from "./queries";
+import { technologiesQuery, allTechnologiesQuery } from "./queries";
 
 type SanityTechnology = {
   _id: string;
@@ -38,6 +38,53 @@ export async function getTechnologies(locale: Locale): Promise<Technology[]> {
         name: item.name,
         icon: item.icon,
         order: item.order ?? 0,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+type SanityTechnologyWithDetails = {
+  _id: string;
+  name?: string | null;
+  icon?: string | null;
+  order?: number | null;
+  category?: string | null;
+};
+
+export async function getAllTechnologies(
+  locale: Locale
+): Promise<TechnologyWithDetails[]> {
+  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+  const safeLocale = locale === "tr" || locale === "en" ? locale : "en";
+
+  if (!projectId) {
+    return [];
+  }
+
+  try {
+    const data = await sanityClient.fetch<
+      SanityTechnologyWithDetails[] | null
+    >(allTechnologiesQuery, { locale: safeLocale });
+
+    if (!data || !Array.isArray(data)) {
+      return [];
+    }
+
+    return data
+      .filter(
+        (item): item is SanityTechnologyWithDetails & {
+          name: string;
+          icon: string;
+          category: string;
+        } => Boolean(item.name && item.icon && item.category)
+      )
+      .map((item) => ({
+        _id: item._id,
+        name: item.name,
+        icon: item.icon,
+        order: item.order ?? 0,
+        category: item.category as TechnologyCategory,
       }));
   } catch {
     return [];

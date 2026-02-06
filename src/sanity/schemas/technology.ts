@@ -16,6 +16,25 @@ export const technologyType = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "category",
+      title: "Kategori",
+      description: "Teknolojinin ait olduğu kategori",
+      type: "string",
+      options: {
+        list: [
+          { title: "Programming Languages", value: "languages" },
+          { title: "Frontend", value: "frontend" },
+          { title: "Backend", value: "backend" },
+          { title: "Database", value: "database" },
+          { title: "DevOps", value: "devops" },
+          { title: "Mobile", value: "mobile" },
+          { title: "Tools", value: "tools" },
+        ],
+        layout: "dropdown",
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: "icon",
       title: "SVG İkon",
       description:
@@ -42,12 +61,22 @@ export const technologyType = defineType({
   preview: {
     select: {
       title: "name.tr",
-      subtitle: "order",
+      category: "category",
+      order: "order",
     },
-    prepare({ title, subtitle }) {
+    prepare({ title, category, order }) {
+      const categoryLabels: Record<string, string> = {
+        languages: "Programming Languages",
+        frontend: "Frontend",
+        backend: "Backend",
+        database: "Database",
+        devops: "DevOps",
+        mobile: "Mobile",
+        tools: "Tools",
+      };
       return {
         title: title || "Adsız",
-        subtitle: `Sıra: ${subtitle ?? 0}`,
+        subtitle: `${categoryLabels[category] ?? "Kategorisiz"} | Sıra: ${order ?? 0}`,
       };
     },
   },

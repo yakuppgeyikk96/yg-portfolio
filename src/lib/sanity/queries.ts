@@ -53,3 +53,27 @@ export const allProjectsQuery = `*[_type == "project"] | order(order asc) {
   githubUrl,
   order
 }`;
+
+export const allBlogPostsQuery = `*[_type == "blogPost"] | order(publishedAt desc) {
+  _id,
+  "title": title[$locale],
+  "slug": slug.current,
+  "excerpt": excerpt[$locale],
+  featuredImage,
+  publishedAt,
+  tags,
+  featured,
+  "body": body[$locale]
+}`;
+
+export const blogPostBySlugQuery = `*[_type == "blogPost" && slug.current == $slug][0] {
+  _id,
+  "title": title[$locale],
+  "slug": slug.current,
+  "excerpt": excerpt[$locale],
+  "body": body[$locale],
+  featuredImage,
+  publishedAt,
+  tags,
+  featured
+}`;

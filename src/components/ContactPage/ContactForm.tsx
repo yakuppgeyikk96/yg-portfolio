@@ -138,6 +138,7 @@ export function ContactForm({ locale }: ContactFormProps) {
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
           placeholder={uiStrings.namePlaceholder[locale]}
+          maxLength={100}
           disabled={isLoading}
           className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-primary/50 focus:shadow-[0_0_10px_rgba(234,88,12,0.1)] disabled:opacity-50"
         />
@@ -155,6 +156,7 @@ export function ContactForm({ locale }: ContactFormProps) {
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
           placeholder={uiStrings.emailPlaceholder[locale]}
+          maxLength={254}
           disabled={isLoading}
           className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-primary/50 focus:shadow-[0_0_10px_rgba(234,88,12,0.1)] disabled:opacity-50"
         />
@@ -171,6 +173,7 @@ export function ContactForm({ locale }: ContactFormProps) {
           value={formData.message}
           onChange={(e) => handleChange("message", e.target.value)}
           placeholder={uiStrings.messagePlaceholder[locale]}
+          maxLength={5000}
           disabled={isLoading}
           rows={5}
           className="w-full resize-none rounded-xl border border-border/50 bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-primary/50 focus:shadow-[0_0_10px_rgba(234,88,12,0.1)] disabled:opacity-50"

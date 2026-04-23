@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@/types/locale";
-import { Briefcase, Code2, Home, Mail, PenLine } from "lucide-react";
+import { Briefcase, Code2, Home, Mail } from "lucide-react";
 import { motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,7 +12,6 @@ const navLinks = [
   { href: "", labelKey: "home", icon: Home },
   { href: "/work", labelKey: "work", icon: Briefcase },
   { href: "/technologies", labelKey: "technologies", icon: Code2 },
-  { href: "/blog", labelKey: "blog", icon: PenLine },
   { href: "/contact", labelKey: "contact", icon: Mail },
 ] as const;
 
@@ -20,7 +19,7 @@ const labels: Record<string, Record<Locale, string>> = {
   home: { en: "Home", tr: "Ana Sayfa" },
   work: { en: "Work", tr: "Projeler" },
   technologies: { en: "Tech", tr: "Teknolojiler" },
-  blog: { en: "Blog", tr: "Blog" },
+
   contact: { en: "Contact", tr: "İletişim" },
 };
 
